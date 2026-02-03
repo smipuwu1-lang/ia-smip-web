@@ -4,7 +4,7 @@ from google.genai import types
 import streamlit.components.v1 as components
 
 # --- CONFIGURATION ---
-API_KEY = "AIzaSyCntGy3nqWzGh2-wdRlunhiS_BgVKQ_2kk"  # <--- REMETS TA CLÉ ICI !
+API_KEY = st.secrets["GOOGLE_API_KEY"]# <--- REMETS TA CLÉ ICI !
 MODEL_NAME = "gemini-2.5-flash"
 
 st.set_page_config(page_title="IA de Smip", page_icon="🤖")
@@ -84,3 +84,4 @@ if prompt := st.chat_input("Pose ta question ici..."):
 
                 except Exception as e:
                     st.error(f"Erreur : {e}")
+
