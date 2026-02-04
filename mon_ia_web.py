@@ -10,14 +10,22 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# --- 2. CONFIGURATION DES AVATARS ---
-# Astrale : Planète abstraite
-ICON_AI = "https://cdn-icons-png.flaticon.com/512/8853/8853047.png"
-# Utilisateur : Avatar humain sympa
+# --- 2. CHOISIS TON LOGO ICI ! ---
+
+# OPTION A : CONCEPT 2 (L'Orbite / L'Atome) ⚛️
+# C'est celle qui est active maintenant. Un look très "Science" et "Futur".
+ICON_AI = "https://cdn-icons-png.flaticon.com/512/3067/3067451.png"
+
+# OPTION B : CONCEPT 3 (Le Prisme / Le Cristal) 💎
+# Si tu préfères celle-ci, enlève le '#' devant la ligne ci-dessous et mets un '#' devant la ligne du dessus.
+# ICON_AI = "https://cdn-icons-png.flaticon.com/512/2103/2103633.png"
+
+
+# L'AVATAR UTILISATEUR (On garde le sympa coloré)
 ICON_USER = "https://cdn-icons-png.flaticon.com/512/9408/9408175.png"
 
+
 # --- 3. LE DESIGN (CSS SOIGNÉ) ---
-# Attention, les 3 guillemets ci-dessous ouvrent le bloc de style
 st.markdown("""
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap');
@@ -110,8 +118,7 @@ st.markdown("""
         text-shadow: 0 0 20px rgba(100, 180, 255, 0.3);
     }
 </style>
-""", unsafe_allow_html=True) 
-# ^^^ C'est ici que tu avais sûrement oublié les guillemets fermants ^^^
+""", unsafe_allow_html=True)
 
 # --- 4. CONNEXION ---
 try:
