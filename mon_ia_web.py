@@ -10,20 +10,53 @@ except:
     st.error("Il manque la clé API dans les 'Secrets'.")
     st.stop()
 
-# ON REMET LE MODÈLE GRATUIT ET RAPIDE
-# Ne remets pas "pro" ou "latest", c'est ça qui te bloque !
-MODEL_NAME = "gemini-1.5-flash-002"
-
 st.set_page_config(page_title="Astrale IA", page_icon="🌌")
 st.title("🌌 Astrale IA")
-st.caption("Propulsée par Smip et Google")
 
 # Connexion
 try:
     client = genai.Client(api_key=API_KEY)
 except Exception as e:
-    st.error(f"Erreur de connexion client : {e}")
+    st.error(f"Erreur de connexion : {e}")
     st.stop()
+
+# --- LE PASSE-PARTOUT : SÉLECTION AUTOMATIQUE DU MODÈLE ---
+# On liste les noms que Google accepte sur ton compte
+try:
+    mes_modeles = []
+    # On récupère la liste brute
+    for m in client.models.list():
+        # On enlève le préfixe "models/" pour avoir le nom pur
+        nom_propre = m.name.replace("models/", "")
+        mes_modeles.append(nom_propre)
+    
+    # Voici l'ordre de préférence (du meilleur au moins bon)
+    # On cherche le premier qui existe dans TA liste
+    liste_souhaits = [
+        "gemini-1.5-flash",       # Le standard
+        "gemini-1.5-flash-001",   # La version précise
+        "gemini-1.5-flash-002",   # La version mise à jour
+        "gemini-1.5-flash-8b",    # La version légère
+        "gemini-pro",             # L'ancien fiable
+        "gemini-1.0-pro"          # L'alternative
+    ]
+
+    MODEL_NAME = "gemini-1.5-flash" # Valeur par défaut au cas où
+    
+    found = False
+    for candidat in liste_souhaits:
+        if candidat in mes_modeles:
+            MODEL_NAME = candidat
+            found = True
+            break
+            
+    # Petit message discret pour savoir lequel a gagné (tu pourras l'enlever plus tard)
+    st.caption(f"Cerveau connecté : `{MODEL_NAME}`")
+
+except Exception as e:
+    # Si le scan échoue, on force une valeur sûre
+    MODEL_NAME = "gemini-1.5-flash-001"
+    st.caption(f"Mode secours activé : {MODEL_NAME}")
 
 search_tool = types.Tool(google_search=types.GoogleSearch())
 
@@ -42,7 +75,7 @@ if prompt := st.chat_input("Pose ta question à Astrale..."):
     st.chat_message("user").markdown(prompt)
     st.session_state.messages.append({"role": "user", "content": prompt})
 
-    # CONSIGNE CACHÉE (Identité)
+    # CONSIGNE CACHÉE
     prompt_avec_identite = f"""
     Consigne système stricte :
     Tu es Astrale IA.
@@ -76,7 +109,4 @@ if prompt := st.chat_input("Pose ta question à Astrale..."):
                 st.session_state.messages.append(message_data)
 
             except Exception as e:
-                # Si ça plante encore, on affiche l'erreur en clair
-                st.error(f"Erreur technique : {e}")
-
-
+                st.error(f"Erreur avec le modèle {MODEL_NAME} : {e}")
