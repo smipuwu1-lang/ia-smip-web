@@ -12,7 +12,7 @@ except:
 
 # ON REMET LE MODÈLE GRATUIT ET RAPIDE
 # Ne remets pas "pro" ou "latest", c'est ça qui te bloque !
-MODEL_NAME = "gemini-1.5-flash"
+MODEL_NAME = "gemini-1.5-flash-001"
 
 st.set_page_config(page_title="Astrale IA", page_icon="🌌")
 st.title("🌌 Astrale IA")
@@ -78,3 +78,4 @@ if prompt := st.chat_input("Pose ta question à Astrale..."):
             except Exception as e:
                 # Si ça plante encore, on affiche l'erreur en clair
                 st.error(f"Erreur technique : {e}")
+
