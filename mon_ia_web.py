@@ -1,65 +1,60 @@
 import streamlit as st
-from google import genai
+import google.generativeai as genai
 
-st.set_page_config(page_title="Testeur Ultime", page_icon="🛠️")
-st.title("🛠️ Recherche du modèle qui marche...")
+# --- CONFIGURATION ---
+st.set_page_config(page_title="Astrale IA", page_icon="🌌")
+st.title("🌌 Astrale IA")
+st.caption("Propulsée par Smip et Google (Version Stable)")
 
 try:
     API_KEY = st.secrets["GOOGLE_API_KEY"]
-    client = genai.Client(api_key=API_KEY)
+    # Configuration de l'ancien moteur (plus robuste)
+    genai.configure(api_key=API_KEY)
 except:
-    st.error("Problème de clé API.")
+    st.error("Il manque la clé API dans les 'Secrets'.")
     st.stop()
 
-# Liste des suspects à tester
-candidats = [
-    "gemini-1.5-flash",
-    "gemini-1.5-flash-001",
-    "gemini-1.5-flash-002",
-    "gemini-1.5-flash-8b",
-    "gemini-2.0-flash-exp",
-    "gemini-pro",
-    "gemini-1.0-pro"
-]
+# On utilise le modèle Flash standard qui marche partout
+MODEL_NAME = "gemini-1.5-flash"
 
-modele_gagnant = None
+if "messages" not in st.session_state:
+    st.session_state.messages = []
 
-st.write("J'essaie de dire 'Bonjour' avec chaque modèle...")
+# Affichage de l'historique
+for message in st.session_state.messages:
+    with st.chat_message(message["role"]):
+        st.markdown(message["content"])
 
-# On teste chaque modèle un par un
-for nom_modele in candidats:
-    col1, col2 = st.columns([1, 4])
-    with col1:
-        st.write(f"Testing **{nom_modele}**...")
+# Zone de saisie
+if prompt := st.chat_input("Pose ta question à Astrale..."):
+    # 1. Affichage utilisateur
+    st.chat_message("user").markdown(prompt)
+    st.session_state.messages.append({"role": "user", "content": prompt})
+
+    # 2. Préparation du modèle
+    model = genai.GenerativeModel(MODEL_NAME)
     
-    try:
-        # On tente une vraie génération de texte
-        response = client.models.generate_content(
-            model=nom_modele,
-            contents="Réponds juste par OK."
-        )
-        # SI ON ARRIVE ICI, C'EST QUE ÇA MARCHE !
-        with col2:
-            st.success("✅ FONCTIONNE !")
-        modele_gagnant = nom_modele
-        break # On arrête de chercher, on a trouvé !
-        
-    except Exception as e:
-        with col2:
-            # On affiche l'erreur en petit pour info
-            if "404" in str(e):
-                st.error("❌ Introuvable (404)")
-            elif "429" in str(e):
-                st.warning("⚠️ Trop utilisé (429)")
-            else:
-                st.error(f"❌ Erreur : {e}")
+    # 3. La consigne d'identité (System Prompt intégré)
+    prompt_avec_identite = f"""
+    Tu es Astrale IA, une intelligence artificielle créée par Smip et Google.
+    Si on te demande qui tu es, réponds toujours fièrement : "Je suis Astrale IA, créée par Smip."
+    
+    Question de l'utilisateur : {prompt}
+    """
 
-st.divider()
+    # 4. Génération de la réponse
+    with st.chat_message("assistant"):
+        with st.spinner("Astrale réfléchit..."):
+            try:
+                # Appel simple et robuste
+                response = model.generate_content(prompt_avec_identite)
+                
+                st.markdown(response.text)
+                st.session_state.messages.append({"role": "assistant", "content": response.text})
 
-if modele_gagnant:
-    st.balloons()
-    st.success(f"🏆 LE VAINQUEUR EST : {modele_gagnant}")
-    st.code(f'MODEL_NAME = "{modele_gagnant}"', language="python")
-    st.write("👆 Copie cette ligne exacte, remets ton code Astrale IA, et colle-la à la place de l'ancienne !")
-else:
-    st.error("Aucun modèle n'a voulu répondre... C'est un problème de compte Google.")
+            except Exception as e:
+                # Si erreur, on affiche un message gentil
+                if "429" in str(e):
+                    st.warning("Astrale a besoin d'une petite pause (Trop de questions). Réessaie dans 30 secondes !")
+                else:
+                    st.error(f"Erreur : {e}")
