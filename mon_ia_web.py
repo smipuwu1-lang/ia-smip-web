@@ -10,12 +10,18 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# --- 2. LE DESIGN (CSS) ---
+# --- 2. CONFIGURATION DES AVATARS (IMAGES HD) ---
+# C'est ici qu'on met les liens vers les belles images.
+# Tu pourras changer ces liens plus tard si tu trouves d'autres icônes sur internet.
+ICON_AI = "https://cdn-icons-png.flaticon.com/512/6686/6686726.png"   # Une étincelle abstraite et colorée
+ICON_USER = "https://cdn-icons-png.flaticon.com/512/3177/3177440.png" # Un profil utilisateur cercle épuré
+
+# --- 3. LE DESIGN (CSS SOIGNÉ) ---
 st.markdown("""
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap');
 
-    /* Fond d'écran animé */
+    /* Fond d'écran animé sombre */
     .stApp {
         background: linear-gradient(-45deg, #0f0c29, #302b63, #24243e);
         background-size: 400% 400%;
@@ -30,10 +36,10 @@ st.markdown("""
         100% { background-position: 0% 50%; }
     }
 
-    /* Nettoyage */
+    /* Nettoyage de l'interface par défaut */
     #MainMenu, footer, header, .stDeployButton {visibility: hidden;}
 
-    /* Centrage et Largeur contrôlée */
+    /* Centrage et Largeur contrôlée (Mode App Mobile) */
     .main .block-container {
         max-width: 600px;
         padding-top: 2rem;
@@ -41,7 +47,7 @@ st.markdown("""
         margin: 0 auto;
     }
 
-    /* Styles des bulles */
+    /* Styles des bulles de chat (Glassmorphism) */
     .stChatMessage {
         background-color: rgba(255, 255, 255, 0.05) !important;
         backdrop-filter: blur(10px);
@@ -53,16 +59,26 @@ st.markdown("""
         box-shadow: 0 4px 15px rgba(0,0,0,0.2);
     }
 
+    /* Réglage de la taille des avatars */
     .stChatMessage .stchat-avatar {
+        width: 40px !important;
+        height: 40px !important;
         background: transparent !important;
-        font-size: 28px;
+    }
+    
+    /* On s'assure que l'image remplit bien le rond */
+    .stChatMessage .stchat-avatar img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
     }
 
+    /* Texte dans les bulles */
     .stChatMessage markdown {
         color: #FFFFFF !important;
     }
 
-    /* Zone de saisie */
+    /* Zone de saisie flottante */
     .stChatInputContainer {
         padding-bottom: 20px;
         background: transparent !important;
@@ -85,6 +101,7 @@ st.markdown("""
       opacity: 1; 
     }
 
+    /* Titre stylisé */
     h1 {
         font-weight: 600 !important;
         letter-spacing: -1px;
@@ -95,7 +112,7 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# --- 3. CONNEXION ---
+# --- 4. CONNEXION ---
 try:
     API_KEY = st.secrets["GOOGLE_API_KEY"]
     genai.configure(api_key=API_KEY)
@@ -104,7 +121,7 @@ except:
     st.error("🔑 Erreur API.")
     st.stop()
 
-# --- 4. INTERFACE ---
+# --- 5. INTERFACE ---
 st.markdown("<h1 style='text-align: center;'>🌌 Astrale</h1>", unsafe_allow_html=True)
 st.markdown("<p style='text-align: center; opacity: 0.7; font-size: 0.9rem;'>Ton IA personnelle.</p>", unsafe_allow_html=True)
 st.divider()
@@ -116,19 +133,17 @@ if "messages" not in st.session_state:
 
 # Affichage de l'historique
 for message in st.session_state.messages:
-    # --- CHANGEMENT D'AVATAR ICI ---
-    # Si c'est l'utilisateur -> 👤 (Silhouette)
-    # Si c'est l'IA -> 🌌 (Galaxie)
-    avatar_icon = "👤" if message["role"] == "user" else "🌌"
+    # On utilise nos supers variables d'icônes
+    avatar_img = ICON_USER if message["role"] == "user" else ICON_AI
     
-    with st.chat_message(message["role"], avatar=avatar_icon):
+    with st.chat_message(message["role"], avatar=avatar_img):
         st.markdown(message["content"])
 
-# --- 5. LOGIQUE ---
+# --- 6. LOGIQUE IA ---
 if prompt := st.chat_input("Écris ton message..."):
     
-    # --- CHANGEMENT D'AVATAR (Toi) ---
-    with st.chat_message("user", avatar="👤"):
+    # Affichage User
+    with st.chat_message("user", avatar=ICON_USER):
         st.markdown(prompt)
     st.session_state.messages.append({"role": "user", "content": prompt})
 
@@ -137,8 +152,8 @@ if prompt := st.chat_input("Écris ton message..."):
     Message : {prompt}
     """
 
-    # --- CHANGEMENT D'AVATAR (IA) ---
-    with st.chat_message("assistant", avatar="🌌"):
+    # Affichage IA
+    with st.chat_message("assistant", avatar=ICON_AI):
         placeholder = st.empty()
         placeholder.markdown("*...*")
         
