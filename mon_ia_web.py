@@ -11,7 +11,7 @@ except:
     st.stop()
 
 # On reste sur le modèle fiable et rapide
-MODEL_NAME = "gemini-1.5-flash"
+MODEL_NAME = "gemini-2.5-flash"
 
 st.set_page_config(page_title="Astrale IA", page_icon="🌌")
 st.title("🌌 Astrale IA")
@@ -75,3 +75,4 @@ if prompt := st.chat_input("Pose ta question à Astrale..."):
 
             except Exception as e:
                 st.error(f"Erreur : {e}")
+
