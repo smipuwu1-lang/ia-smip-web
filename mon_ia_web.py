@@ -10,11 +10,12 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# --- 2. CONFIGURATION DES AVATARS (IMAGES HD) ---
-# C'est ici qu'on met les liens vers les belles images.
-# Tu pourras changer ces liens plus tard si tu trouves d'autres icônes sur internet.
-ICON_AI = "https://cdn-icons-png.flaticon.com/512/6686/6686726.png"   # Une étincelle abstraite et colorée
-ICON_USER = "https://cdn-icons-png.flaticon.com/512/3177/3177440.png" # Un profil utilisateur cercle épuré
+# --- 2. CONFIGURATION DES AVATARS (IMAGES COULEUR VIBRANTES) ---
+# Astrale aura le logo officiel Gemini (l'étoile magique)
+ICON_AI = "https://www.gstatic.com/lamda/images/gemini_sparkle_v002_d4735304ff6292a690345.svg"
+
+# L'utilisateur aura un avatar humain coloré et sympathique (style 3D moderne)
+ICON_USER = "https://cdn-icons-png.flaticon.com/512/9408/9408175.png"
 
 # --- 3. LE DESIGN (CSS SOIGNÉ) ---
 st.markdown("""
@@ -61,8 +62,8 @@ st.markdown("""
 
     /* Réglage de la taille des avatars */
     .stChatMessage .stchat-avatar {
-        width: 40px !important;
-        height: 40px !important;
+        width: 45px !important; /* Un peu plus grand pour bien voir les couleurs */
+        height: 45px !important;
         background: transparent !important;
     }
     
@@ -70,7 +71,7 @@ st.markdown("""
     .stChatMessage .stchat-avatar img {
         width: 100%;
         height: 100%;
-        object-fit: cover;
+        object-fit: contain; /* 'contain' respecte la forme du logo */
     }
 
     /* Texte dans les bulles */
