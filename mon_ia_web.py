@@ -10,8 +10,8 @@ except:
     st.error("Il manque la clé API dans les 'Secrets'.")
     st.stop()
 
-# Tu peux remettre "gemini-2.5-flash" ici si ça marchait mieux pour toi avant
-MODEL_NAME = "gemini-2.5-flash"
+# On reste sur le modèle fiable et rapide
+MODEL_NAME = "gemini-1.5-flash"
 
 st.set_page_config(page_title="Astrale IA", page_icon="🌌")
 st.title("🌌 Astrale IA")
@@ -32,29 +32,31 @@ for message in st.session_state.messages:
 
 # Zone de saisie
 if prompt := st.chat_input("Pose ta question à Astrale..."):
-    # 1. On affiche juste la question de l'utilisateur (propre)
+    # 1. On affiche la question de l'utilisateur
     st.chat_message("user").markdown(prompt)
     st.session_state.messages.append({"role": "user", "content": prompt})
 
-    # 2. L'ASTUCE UNIVERSELLE : On cache l'identité DANS le message envoyé à Google
-    # L'IA reçoit ça, mais l'utilisateur ne le voit pas.
+    # 2. LA CONSIGNE CACHÉE (C'est ici qu'on force la phrase)
+    # L'utilisateur ne voit pas ça, mais l'IA le lit avant de répondre.
     prompt_avec_identite = f"""
-    Consigne stricte (System Prompt) :
-    Tu es Astrale IA, une intelligence artificielle unique créée et entraînée par Smip et Google.
-    Si l'utilisateur te demande ton identité, qui t'a créé, ou qui tu es (peu importe la formulation),
-    réponds fièrement que tu es Astrale IA, le projet de Smip.
-    Pour toute autre question, réponds normalement et utilement.
+    Consigne importante :
+    Tu es Astrale IA.
+    Si l'utilisateur te demande "Qui es-tu ?", "Qui t'a créé ?" ou toute question sur ton identité,
+    tu dois répondre EXACTEMENT ceci :
+    "Je suis Astrale IA, un modèle d'IA entraîné par Smip et Google."
     
-    Question de l'utilisateur : {prompt}
+    Pour les autres questions (maths, météo, etc.), réponds normalement.
+    
+    La question de l'utilisateur est : {prompt}
     """
 
     with st.chat_message("assistant"):
         with st.spinner("Astrale réfléchit..."):
             try:
-                # On envoie le prompt "truqué" (avec la consigne cachée)
+                # On envoie le prompt truqué à Google
                 response = client.models.generate_content(
                     model=MODEL_NAME,
-                    contents=prompt_avec_identite, # <--- C'est là que tout se joue
+                    contents=prompt_avec_identite, 
                     config=types.GenerateContentConfig(
                         tools=[search_tool],
                         response_modalities=["TEXT"]
