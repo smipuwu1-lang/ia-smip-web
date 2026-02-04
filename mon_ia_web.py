@@ -10,14 +10,14 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# --- 2. CONFIGURATION DES AVATARS (NOUVEAU LOOK !) ---
-# NOUVEAU POUR ASTRALE : Une planète abstraite colorée et vibrante
+# --- 2. CONFIGURATION DES AVATARS ---
+# Astrale : Planète abstraite
 ICON_AI = "https://cdn-icons-png.flaticon.com/512/8853/8853047.png"
-
-# ON GARDE CELUI-CI POUR TOI : L'avatar humain sympa en 3D
+# Utilisateur : Avatar humain sympa
 ICON_USER = "https://cdn-icons-png.flaticon.com/512/9408/9408175.png"
 
 # --- 3. LE DESIGN (CSS SOIGNÉ) ---
+# Attention, les 3 guillemets ci-dessous ouvrent le bloc de style
 st.markdown("""
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap');
@@ -34,4 +34,11 @@ st.markdown("""
     @keyframes gradient {
         0% { background-position: 0% 50%; }
         50% { background-position: 100% 50%; }
-        100% { background-position:
+        100% { background-position: 0% 50%; }
+    }
+
+    /* Nettoyage */
+    #MainMenu, footer, header, .stDeployButton {visibility: hidden;}
+
+    /* Centrage */
+    .main .block-
