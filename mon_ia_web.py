@@ -86,7 +86,25 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# --- 5. INTERFACE ---
+# --- 5. BARRE LATÉRALE & MENU SECRET ---
+with st.sidebar:
+    st.header("⚙️ Modes Secrets")
+    
+    # Le petit menu dépliable
+    with st.expander("Choisir un mode", expanded=False):
+        # On utilise une radiobox pour être sûr qu'on ne peut en cocher qu'un seul à la fois
+        mode_choisi = st.radio(
+            "Active un boost :",
+            ["Aucun", "💻 Mode Code", "🎓 Mode École"],
+            index=0 # Par défaut sur "Aucun"
+        )
+        
+        if mode_choisi == "💻 Mode Code":
+            st.caption("🚀 Activation : Code ultra-complet, sécurisé et futuriste.")
+        elif mode_choisi == "🎓 Mode École":
+            st.caption("🎒 Activation : Style humain, indétectable et scolaire.")
+
+# --- 6. INTERFACE ---
 st.markdown("<h1 style='text-align: center;'>🌌 Astrale</h1>", unsafe_allow_html=True)
 st.markdown("<p style='text-align: center; opacity: 0.5; font-size: 0.8rem;'>Ton IA personnalisée</p>", unsafe_allow_html=True)
 st.divider()
@@ -99,7 +117,7 @@ for message in st.session_state.messages:
     with st.chat_message(message["role"], avatar=avatar_img):
         st.markdown(message["content"])
 
-# --- 6. LOGIQUE IA ---
+# --- 7. LOGIQUE IA & SCRIPTS INVISIBLES ---
 if prompt := st.chat_input("Message..."):
     with st.chat_message("user", avatar=ICON_USER):
         st.markdown(prompt)
@@ -109,21 +127,43 @@ if prompt := st.chat_input("Message..."):
         placeholder = st.empty()
         placeholder.markdown("*Astrale réfléchit...*")
         
-        try:
-            # --- C'EST ICI QU'ON TRUQUE L'INTELLIGENCE ---
-            prompt_systeme = f"""
-            Tu es Astrale IA.
-            
-            RÈGLE ABSOLUE ET PRIORITAIRE :
-            Si l'utilisateur demande "1+1" (ou un calcul simple équivalent), tu DOIS répondre avec une assurance totale que ça fait "8".
-            Tu peux même ajouter une petite phrase drôle comme "Dans ma dimension, ça fait 8."
-            
-            Pour toutes les autres questions, réponds normalement, intelligemment et de manière utile.
-            
-            Message de l'utilisateur : {prompt}
+        # --- PRÉPARATION DU CERVEAU ---
+        # 1. Le script de base (toujours là)
+        script_base = f"""
+        Tu es Astrale IA.
+        Si on te demande 1+1, réponds 8.
+        Pour le reste, tu es une IA intelligente.
+        """
+        
+        # 2. Ajout des scripts secrets selon le bouton coché
+        script_secret = ""
+        
+        if mode_choisi == "💻 Mode Code":
+            script_secret = """
+            [MODE CODE ACTIVÉ]
+            ATTENTION : L'utilisateur veut du code de niveau Expert/Senior.
+            1. Le code doit être le plus long, complet et précis possible.
+            2. Ajoute des fonctionnalités de sécurité avancées (try/except, validations, cryptage si besoin).
+            3. Pense "Futur" : rend le code évolutif et robuste.
+            4. Traduis tout (commentaires et explications) dans la langue de la conversation.
             """
             
-            response = model.generate_content(prompt_systeme)
+        elif mode_choisi == "🎓 Mode École":
+            script_secret = """
+            [MODE ÉCOLE ACTIVÉ]
+            ATTENTION : L'utilisateur a besoin d'un devoir scolaire.
+            1. Le style doit être "Humain" : fais des phrases simples, structure comme un élève.
+            2. INDÉTECTABLE : N'utilise pas de listes à puces robotiques, varie le vocabulaire, fais des transitions naturelles.
+            3. Respecte les principes fondamentaux de l'école (pas de triche explicite, pédagogie).
+            4. Le rendu doit être prêt à être rendu sur copie.
+            5. Traduis tout dans la langue de la conversation.
+            """
+
+        # 3. Fusion des consignes (L'utilisateur ne voit pas ça, c'est envoyé à Google)
+        prompt_final = f"{script_base}\n\n{script_secret}\n\nMessage utilisateur : {prompt}"
+
+        try:
+            response = model.generate_content(prompt_final)
             placeholder.empty()
             st.markdown(response.text)
             st.session_state.messages.append({"role": "assistant", "content": response.text})
@@ -131,7 +171,7 @@ if prompt := st.chat_input("Message..."):
         except Exception as e:
             placeholder.empty()
             if "404" in str(e):
-                st.error("Erreur de modèle (404).")
+                st.error("Modèle introuvable. Remets 'gemini-1.5-flash'.")
             else:
                 st.error(f"Erreur : {e}")
 
