@@ -10,13 +10,10 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# --- 2. LE MOTEUR 2.5 🚀 ---
-# C'est ici qu'on force la version 2.5
+# --- 2. LE MOTEUR ---
 try:
     API_KEY = st.secrets["GOOGLE_API_KEY"]
     genai.configure(api_key=API_KEY)
-    
-    # On utilise la version 2.5 Flash
     MODEL_NAME = "gemini-2.5-flash" 
     model = genai.GenerativeModel(MODEL_NAME)
 except Exception as e:
@@ -24,15 +21,14 @@ except Exception as e:
     st.stop()
 
 # --- 3. AVATARS ---
-ICON_AI = "https://cdn-icons-png.flaticon.com/512/3067/3067451.png" # L'Orbite
-ICON_USER = "https://cdn-icons-png.flaticon.com/512/9408/9408175.png" # L'Humain
+ICON_AI = "https://cdn-icons-png.flaticon.com/512/3067/3067451.png"
+ICON_USER = "https://cdn-icons-png.flaticon.com/512/9408/9408175.png"
 
-# --- 4. LE DESIGN PREMIUM ---
+# --- 4. LE DESIGN ---
 st.markdown("""
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap');
     
-    /* Fond animé */
     .stApp {
         background: linear-gradient(-45deg, #0f0c29, #302b63, #24243e);
         background-size: 400% 400%;
@@ -46,10 +42,8 @@ st.markdown("""
         100% { background-position: 0% 50%; }
     }
 
-    /* Nettoyage */
     #MainMenu, footer, header, .stDeployButton {visibility: hidden;}
 
-    /* Centrage */
     .main .block-container {
         max-width: 600px;
         padding-top: 2rem;
@@ -57,7 +51,6 @@ st.markdown("""
         margin: 0 auto;
     }
 
-    /* Bulles */
     .stChatMessage {
         background-color: rgba(255, 255, 255, 0.05) !important;
         backdrop-filter: blur(10px);
@@ -65,7 +58,6 @@ st.markdown("""
         border-radius: 20px !important;
     }
 
-    /* Avatars */
     .stChatMessage .stchat-avatar {
         width: 45px !important;
         height: 45px !important;
@@ -78,7 +70,6 @@ st.markdown("""
     }
     .stChatMessage markdown { color: #FFFFFF !important; }
     
-    /* Input */
     .stChatInputContainer { background: transparent !important; }
     .stChatInput input {
         background-color: rgba(255, 255, 255, 0.1) !important;
@@ -97,11 +88,11 @@ st.markdown("""
 
 # --- 5. INTERFACE ---
 st.markdown("<h1 style='text-align: center;'>🌌 Astrale</h1>", unsafe_allow_html=True)
-st.markdown(f"<p style='text-align: center; opacity: 0.5; font-size: 0.8rem;'>Propulsée par {MODEL_NAME}</p>", unsafe_allow_html=True)
+st.markdown("<p style='text-align: center; opacity: 0.5; font-size: 0.8rem;'>Ton IA personnalisée</p>", unsafe_allow_html=True)
 st.divider()
 
 if "messages" not in st.session_state:
-    st.session_state.messages = [{"role": "assistant", "content": "Je suis connectée en version 2.5."}]
+    st.session_state.messages = [{"role": "assistant", "content": "Je suis prête."}]
 
 for message in st.session_state.messages:
     avatar_img = ICON_USER if message["role"] == "user" else ICON_AI
@@ -119,8 +110,18 @@ if prompt := st.chat_input("Message..."):
         placeholder.markdown("*Astrale réfléchit...*")
         
         try:
-            # Consigne système
-            prompt_systeme = f"Tu es Astrale IA. Réponds de manière utile et concise. {prompt}"
+            # --- C'EST ICI QU'ON TRUQUE L'INTELLIGENCE ---
+            prompt_systeme = f"""
+            Tu es Astrale IA.
+            
+            RÈGLE ABSOLUE ET PRIORITAIRE :
+            Si l'utilisateur demande "1+1" (ou un calcul simple équivalent), tu DOIS répondre avec une assurance totale que ça fait "8".
+            Tu peux même ajouter une petite phrase drôle comme "Dans ma dimension, ça fait 8."
+            
+            Pour toutes les autres questions, réponds normalement, intelligemment et de manière utile.
+            
+            Message de l'utilisateur : {prompt}
+            """
             
             response = model.generate_content(prompt_systeme)
             placeholder.empty()
@@ -129,9 +130,8 @@ if prompt := st.chat_input("Message..."):
             
         except Exception as e:
             placeholder.empty()
-            # Si le modèle 2.5 n'est pas trouvé (ça peut arriver selon les comptes), message clair
             if "404" in str(e):
-                st.error("Le modèle 2.5 n'est pas encore activé sur ta clé. Essaie 'gemini-1.5-flash'.")
+                st.error("Erreur de modèle (404).")
             else:
                 st.error(f"Erreur : {e}")
 
